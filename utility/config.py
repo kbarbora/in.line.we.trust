@@ -48,8 +48,8 @@ class Paths(Config):
         super().__init__('paths')
 
     @property
-    def aug(self):
-        return self.get_property('aug')
+    def graph(self):
+        return self.get_property('graph')
 
     @property
     def cpg(self):

@@ -1,0 +1,11 @@
+digraph {
+  23212 [label=METHOD AST_PARENT_TYPE="TYPE_DECL" AST_PARENT_FULL_NAME="/home/kb/PycharmProjects/in-line-we-trust/data/raw/openssl/functions/bn_sqr_comba8--dfeab0689f69c0b4bd34.c:<global>" ORDER=1 CODE="<global>" FULL_NAME="/home/kb/PycharmProjects/in-line-we-trust/data/raw/openssl/functions/bn_sqr_comba8--dfeab0689f69c0b4bd34.c:<global>" IS_EXTERNAL=false FILENAME="/home/kb/PycharmProjects/in-line-we-trust/data/raw/openssl/functions/bn_sqr_comba8--dfeab0689f69c0b4bd34.c" SIGNATURE="" NAME="<global>"]
+  23213 [label=BLOCK ORDER=1 ARGUMENT_INDEX=-1 CODE="<empty>" TYPE_FULL_NAME="ANY"]
+  23214 [label=METHOD_RETURN ORDER=2 CODE="RET" TYPE_FULL_NAME="ANY" EVALUATION_STRATEGY="BY_VALUE"]
+  23214 -> 23212 [label=POST_DOMINATE ]
+  23212 -> 23214 [label=AST ]
+  23212 -> 23213 [label=AST ]
+  23212 -> 23214 [label=DOMINATE ]
+  23212 -> 23213 [label=CONTAINS ]
+  23212 -> 23214 [label=CFG ]
+}

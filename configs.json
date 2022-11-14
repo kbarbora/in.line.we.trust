@@ -20,7 +20,7 @@
         "joern_cli_dir": "joern-cli/"
     },
     "paths" : {
-        "aug" : "data/aug_graph/",
+        "graph" : "data/graph/",
         "cpg" : "data/cpg/",
         "cpg_pickle": "data/cpg/pickle/",
         "temp" : "data/temp/",

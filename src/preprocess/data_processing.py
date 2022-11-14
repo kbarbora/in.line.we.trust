@@ -1,3 +1,4 @@
+import errno
 import glob
 import json
 import logging
@@ -18,6 +19,7 @@ import src.data as data
 from data import datamanager as data
 
 PATHS = configs.Paths()
+PROJ_ROOT = os.path.abspath('.')  # path of the root project
 
 
 def _create_slices(project: str, project_dataset: pd.DataFrame) -> int:
@@ -60,7 +62,7 @@ def _create_slices(project: str, project_dataset: pd.DataFrame) -> int:
     return max_len
 
 
-def create_cpg(project: str, dataset: pd.DataFrame, javaheap: int):
+def create_cpg(project: str, javaheap: int = 4):
     """
     Get the vulnerable functions and create the cpg files to later extract the functions.
     The main problem is that there are different definitions of a function (with same name)
@@ -72,7 +74,7 @@ def create_cpg(project: str, dataset: pd.DataFrame, javaheap: int):
     else:
         logging.info(f"Java HEAP environment variable already set by external process to {javaheap}GB. Continue.")
 
-    _sourcefiles = pathjoin(PATHS.raw, "functions")
+    _sourcefiles = pathjoin(PATHS.raw, project, "functions")
     _outfile = pathjoin(PATHS.cpg, f"{project}.bin")
     if os.path.exists(_outfile):
         logging.warning(f"File {_outfile} exists. Skipping.")
@@ -84,38 +86,24 @@ def create_cpg(project: str, dataset: pd.DataFrame, javaheap: int):
     return _outfile
 
 
-def create_struct(cpg_files: list, joint_graph=False, joern_path="joern-cli/") -> dict:
-    output = {}
-    run_structs = False
+def extract_graph(project: str, cpg_path: list, joern_path: str) -> list:
+    output_path = pathjoin(PATHS.graph, project)
+    tmp_path = pathjoin(output_path, "tmp")
+    if not os.path.exists(cpg_path):
+        logging.error(f"CPG file located at {cpg_path} not found. Exit.")
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), cpg_path)
+    if os.path.exists(output_path):
+        logging.warning(f"GRAPH output path exists {output_path}. Return existing files.")
+        return os.listdir(output_path)
+    subprocess.run([f"./{joern_path}joern-export", "--repr", "cpg", "--out", tmp_path,
+                    cpg_path], check=True)
+    # Clean output files structure
+    tmp_output_files = pathjoin(output_path, "_root_", PROJ_ROOT, PATHS.raw, project, "functions")
+    os.rename(tmp_output_files, output_path)
+    for dir, function, graph in os.listdir(output_path):
+        if dir == '.':
+            continue
+        curr = pathjoin(dir, graph[-1])  # @ TODO
+    logging.info(f"[Info] - Extracted graphs from dataset {cpg_path}.")
 
-    for cpg in cpg_files:
-        cpg_file = cpg.split('/')[-1]
-        project = cpg.split('/')[-2]
-        dir = pathjoin(PATHS.struct, project, cpg_file)
-        if not os.path.exists(dir):
-            run_structs = True
-            os.mkdir(dir)
-        output[dir] = {}
-        if not joint_graph:
-            structs = ["all"]
-        else:
-            structs = STRUCTS
-        for s in structs:
-            out_dir = pathjoin(dir, s)
-            # timer = time.time()
-            input_dir = pathjoin(PATHS.raw, project, "slices", cpg_file[:-4])
-            if run_structs:
-                subprocess.run([f"./{joern_path}joern-export", "--repr", s, "--out", out_dir,
-                                pathjoin(PATHS.cpg, project, cpg_file)], check=True)
-            output_files = sorted(os.listdir(out_dir))
-            logging.info(f"[Info] - Extracted {s} from dataset {cpg_file} producing {len(output_files)} files. ")
-            print(f"[Info] - Extracted {s} from dataset {cpg_file} producing {len(output_files)} files. ")
-            if not os.path.exists(pathjoin(out_dir, "clean")):
-                output[dir][s] = graph_generator.clean_graph_structs(s, input_dir, out_dir)
-                clean_file = open(pathjoin(out_dir, "clean"), 'w+')
-                clean_file.close()
-            else:
-                output[dir][s] = os.listdir(pathjoin(dir, s))
-
-    # at this point all structs needed for all dataset should be created.
     return output

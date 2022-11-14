@@ -9,7 +9,7 @@ import preprocess.scrapper as scrapper
 
 
 PATHS = config.Paths()
-
+PROJ_ROOT = os.path.abspath('.')  # path of the root project
 def preprocess(project: str):
     """
 
