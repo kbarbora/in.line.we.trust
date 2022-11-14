@@ -1,8 +1,0 @@
-digraph {
-  12969 [label=METHOD COLUMN_NUMBER=5 LINE_NUMBER=2 COLUMN_NUMBER_END=15 IS_EXTERNAL=false SIGNATURE="int test_sqr ()" NAME="test_sqr" AST_PARENT_TYPE="TYPE_DECL" AST_PARENT_FULL_NAME="/home/kb/PycharmProjects/in-line-we-trust/data/raw/openssl/functions/test_sqr--d02b48c63a58ea4367a0.c:<global>" ORDER=2 CODE="int test_sqr ()" FULL_NAME="test_sqr" LINE_NUMBER_END=2 FILENAME="/home/kb/PycharmProjects/in-line-we-trust/data/raw/openssl/functions/test_sqr--d02b48c63a58ea4367a0.c"]
-  12970 [label=METHOD_RETURN ORDER=1 CODE="int" COLUMN_NUMBER=5 LINE_NUMBER=2 TYPE_FULL_NAME="int" EVALUATION_STRATEGY="BY_VALUE"]
-  12969 -> 12970 [label=CFG ]
-  12969 -> 12970 [label=AST ]
-  12969 -> 12970 [label=DOMINATE ]
-  12970 -> 12969 [label=POST_DOMINATE ]
-}
