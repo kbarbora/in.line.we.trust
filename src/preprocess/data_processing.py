@@ -112,14 +112,14 @@ def extract_graph(project: str) -> str:
     logging.info(f"[Info] - Extracted {len(os.listdir(output_path))}graphs from dataset {cpg_path}.")
     return output_path
 
+
 def load_graphs(project: str) -> dict:
     input_graphs = pathjoin(PATHS.graph, project)
     output_graphs = {}
     _, _, graphs = next(os.walk(input_graphs))
     for graph in graphs:
-        # make sure to install pydot
         graph_path = pathjoin(input_graphs, graph)
-        g = nx.Graph(nx.nx_pydot.read_dot(graph_path))
+        g = nx.Graph(nx.nx_pydot.read_dot(graph_path))  # uses pydot module
         output_graphs[graph] = g
 
 

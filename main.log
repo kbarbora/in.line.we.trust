@@ -1,0 +1,16 @@
+INFO:root:Dataset memory information: 
+None
+INFO:root:Java HEAP environment variable already set to 4GB. Continue.
+INFO:root:Creating CPG for source project openssl
+INFO:root:CPG file created: data/cpg/openssl.bin
+WARNING:root:Graph output did not produced function. Only _global_.dot.
+WARNING:root:Graph output did not produced function. Only _global_.dot.
+WARNING:root:Graph output did not produced function. Only _global_.dot.
+WARNING:root:Graph output did not produced function. Only _global_.dot.
+WARNING:root:Graph output did not produced function. Only _global_.dot.
+WARNING:root:Graph output did not produced function. Only _global_.dot.
+WARNING:root:Graph output did not produced function. Only _global_.dot.
+WARNING:root:Graph output did not produced function. Only _global_.dot.
+WARNING:root:Graph output did not produced function. Only _global_.dot.
+WARNING:root:Graph output did not produced function. Only _global_.dot.
+INFO:root:[Info] - Extracted 52graphs from dataset data/cpg/openssl.bin.
