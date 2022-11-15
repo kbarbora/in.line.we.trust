@@ -6,6 +6,7 @@ from os.path import join as pathjoin
 from argparse import ArgumentParser
 import utility.config as config
 import preprocess.scrapper as scrapper
+import preprocess.data_processing as data_processing
 
 
 PATHS = config.Paths()
@@ -25,7 +26,11 @@ def preprocess(project: str):
     logging.info(f"Dataset memory information: \n{dataset.info(memory_usage='deep')}")
 
     # ---------- Check for cpg files, if not found run joern-parse to create them ---------------
-
+    data_processing.create_cpg(project)
+    # ----------- Check for graphs, if not found run joern-export to create them ----------------
+    graphs_paths = data_processing.extract_graph(project)
+    # ----------- Load graphs
+    graphs_data =
 
 
 
@@ -47,8 +52,8 @@ def main():
     if not args.project:
         logging.error("[Error] - Choose ONE between ffmpeg, imagemagick, php, openssl or linux datasets.")
     if int(args.max_java_mem) > 0:
-        os.environ['_JAVA_OPTS'] = f"-Xmx{args.max_java_mem}G"
-    if args.create:
+        os.environ["JAVA_OPTS"] = f"-Xmx{args.max_java_mem}G"
+    if args.preprocess:
         proj = args.project
         if not (('ffmpeg' == proj) or ('php' == proj) or ('openssl' == proj) or ('linux' == proj)
                 or ('imagemagick' == proj) or ('all' == proj)):

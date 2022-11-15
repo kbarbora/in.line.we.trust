@@ -15,8 +15,6 @@ import logging
 import pandas as pd
 import networkx as nx
 import utility.config as configs
-import src.data as data
-from data import datamanager as data
 
 PATHS = configs.Paths()
 PROJ_ROOT = os.path.abspath('.')  # path of the root project
@@ -72,7 +70,7 @@ def create_cpg(project: str, javaheap: int = 4):
         logging.info(f"Setting Java HEAP to a max of {javaheap}GB")
         os.environ["JAVA_OPTS"] = f"-Xms128M -Xmx{javaheap}G"
     else:
-        logging.info(f"Java HEAP environment variable already set by external process to {javaheap}GB. Continue.")
+        logging.info(f"Java HEAP environment variable already set to {javaheap}GB. Continue.")
 
     _sourcefiles = pathjoin(PATHS.raw, project, "functions")
     _outfile = pathjoin(PATHS.cpg, f"{project}.bin")
@@ -86,24 +84,44 @@ def create_cpg(project: str, javaheap: int = 4):
     return _outfile
 
 
-def extract_graph(project: str, cpg_path: list, joern_path: str) -> list:
+def extract_graph(project: str) -> str:
     output_path = pathjoin(PATHS.graph, project)
-    tmp_path = pathjoin(output_path, "tmp")
-    if not os.path.exists(cpg_path):
-        logging.error(f"CPG file located at {cpg_path} not found. Exit.")
-        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), cpg_path)
+    cpg_path = pathjoin(PATHS.cpg, project+'.bin')
     if os.path.exists(output_path):
         logging.warning(f"GRAPH output path exists {output_path}. Return existing files.")
         return os.listdir(output_path)
-    subprocess.run([f"./{joern_path}joern-export", "--repr", "cpg", "--out", tmp_path,
+    temp_path = pathjoin(PATHS.temp, project)
+    subprocess.run([f"./{pathjoin(PATHS.joern, 'joern-export')}", "--repr", "cpg", "--out", temp_path,
                     cpg_path], check=True)
+    # @TODO rename output to remove extension
     # Clean output files structure
-    tmp_output_files = pathjoin(output_path, "_root_", PROJ_ROOT, PATHS.raw, project, "functions")
-    os.rename(tmp_output_files, output_path)
-    for dir, function, graph in os.listdir(output_path):
-        if dir == '.':
+    temp_output_files = pathjoin(temp_path, "_root_") + PROJ_ROOT + '/' + pathjoin(PATHS.raw, project, "functions")
+    os.rename(temp_output_files, output_path)
+    shutil.rmtree(temp_path)
+    for dir, _, graph in os.walk(output_path):
+        if dir == output_path:
             continue
-        curr = pathjoin(dir, graph[-1])  # @ TODO
-    logging.info(f"[Info] - Extracted graphs from dataset {cpg_path}.")
+        if len(graph) == 1:
+            logging.warning(f"Graph output did not produced function. Only {graph[0]}.")
+            shutil.rmtree(dir)
+            continue
+        curr = pathjoin(dir, graph[-1])
+        file_commit = dir.split(os.path.sep)[-1][0:-2]
+        os.rename(curr, pathjoin(output_path, file_commit+'.dot'))
+        shutil.rmtree(dir)
+    logging.info(f"[Info] - Extracted {len(os.listdir(output_path))}graphs from dataset {cpg_path}.")
+    return output_path
 
-    return output
+def load_graphs(project: str) -> dict:
+    input_graphs = pathjoin(PATHS.graph, project)
+    output_graphs = {}
+    _, _, graphs = next(os.walk(input_graphs))
+    for graph in graphs:
+        # make sure to install pydot
+        graph_path = pathjoin(input_graphs, graph)
+        g = nx.Graph(nx.nx_pydot.read_dot(graph_path))
+        output_graphs[graph] = g
+
+
+
+    return output_graphs
