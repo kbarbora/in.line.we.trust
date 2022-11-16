@@ -14,3 +14,13 @@ WARNING:root:Graph output did not produced function. Only _global_.dot.
 WARNING:root:Graph output did not produced function. Only _global_.dot.
 WARNING:root:Graph output did not produced function. Only _global_.dot.
 INFO:root:[Info] - Extracted 52graphs from dataset data/cpg/openssl.bin.
+INFO:root:Dataset memory information: 
+None
+INFO:root:Java HEAP environment variable already set to 4GB. Continue.
+WARNING:root:File data/cpg/openssl.bin exists. Skipping.
+WARNING:root:GRAPH output path exists data/graph/openssl. Return existing files.
+INFO:root:Dataset memory information: 
+None
+INFO:root:Java HEAP environment variable already set to 4GB. Continue.
+WARNING:root:File data/cpg/openssl.bin exists. Skipping.
+WARNING:root:GRAPH output path exists data/graph/openssl. Return existing files.

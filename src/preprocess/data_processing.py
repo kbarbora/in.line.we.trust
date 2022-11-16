@@ -15,6 +15,7 @@ import logging
 import pandas as pd
 import networkx as nx
 import utility.config as configs
+from torch_geometric.data import Data as GraphData
 
 PATHS = configs.Paths()
 PROJ_ROOT = os.path.abspath('.')  # path of the root project
@@ -118,6 +119,7 @@ def load_graphs(project: str) -> dict:
     output_graphs = {}
     _, _, graphs = next(os.walk(input_graphs))
     for graph in graphs:
+        graph = graph.split('.')[0]  # remove extension
         graph_path = pathjoin(input_graphs, graph)
         g = nx.Graph(nx.nx_pydot.read_dot(graph_path))  # uses pydot module
         output_graphs[graph] = g
@@ -125,3 +127,18 @@ def load_graphs(project: str) -> dict:
 
 
     return output_graphs
+
+def append_graph_to_dataset(dataset: pd.DataFrame, output_graphs: dict) -> pd.DataFrame:
+    empty_list = [""]*len(dataset)
+    dataset['graph'] = empty_list
+    for _, data in dataset.iterrows():
+        _function_name = data['function_name']
+        _commit = data['commit']
+        _full_name = _commit + '--' + _function_name
+        if output_graphs[_full_name] == "" or isinstance(output_graphs[_full_name], GraphData):
+            continue
+        # update dataset in place
+        dataset.loc[(dataset.function_name == _function_name) & (dataset.commit == _commit),
+                    ['graph']] = output_graphs[_full_name]
+    return dataset
+

@@ -30,7 +30,8 @@ def preprocess(project: str):
     # ----------- Check for graphs, if not found run joern-export to create them ----------------
     graphs_paths = data_processing.extract_graph(project)
     # ----------- Load graphs
-    data_processing.load_graphs(project)
+    graphs_data = data_processing.load_graphs(project)
+    data_processing.append_graph_to_dataset(dataset, graphs_data)
 
 
 
