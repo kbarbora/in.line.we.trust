@@ -16,6 +16,8 @@ import pandas as pd
 import networkx as nx
 import utility.config as configs
 from torch_geometric.data import Data as GraphData
+from networkx.drawing import nx_agraph
+import pygraphviz as pgv
 
 PATHS = configs.Paths()
 PROJ_ROOT = os.path.abspath('.')  # path of the root project
@@ -121,7 +123,13 @@ def load_graphs(project: str) -> dict:
     for graph in graphs:
         graph = graph.split('.')[0]  # remove extension
         graph_path = pathjoin(input_graphs, graph)
-        g = nx.Graph(nx.nx_pydot.read_dot(graph_path))  # uses pydot module
+        g = nx_agraph.from_agraph(pgv.AGraph(graph_path))
+        graphdata = GraphData()
+        for node, node_attr in g.nodes(data=True):
+            graphdata[node] = node_attr
+        graphdata.edge_index = list(g.nodes())
+
+        # g = nx.Graph(nx.nx_pydot.read_dot(graph_path))  # uses pydot module
         output_graphs[graph] = g
 
 
