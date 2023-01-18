@@ -121,8 +121,8 @@ def load_graphs(project: str) -> dict:
     output_graphs = {}
     _, _, graphs = next(os.walk(input_graphs))
     for graph in graphs:
-        graph = graph.split('.')[0]  # remove extension
         graph_path = pathjoin(input_graphs, graph)
+        graph = graph.split('.')[0]  # remove extension
         g = nx_agraph.from_agraph(pgv.AGraph(graph_path))
         graphdata = GraphData()
         for node, node_attr in g.nodes(data=True):
@@ -137,7 +137,7 @@ def load_graphs(project: str) -> dict:
     return output_graphs
 
 def append_graph_to_dataset(dataset: pd.DataFrame, output_graphs: dict) -> pd.DataFrame:
-    empty_list = [""]*len(dataset)
+    empty_list = [""]*len(output_graphs)
     dataset['graph'] = empty_list
     for _, data in dataset.iterrows():
         _function_name = data['function_name']
