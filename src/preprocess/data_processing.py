@@ -89,7 +89,7 @@ def create_cpg(project: str, javaheap: int = 4):
 
 def extract_graph(project: str) -> str:
     output_path = pathjoin(PATHS.graph, project)
-    cpg_path = pathjoin(PATHS.cpg, project+'.bin')
+    cpg_path = pathjoin(PATHS.cpg, project + '.bin')
     if os.path.exists(output_path):
         logging.warning(f"GRAPH output path exists {output_path}. Return existing files.")
         return os.listdir(output_path)
@@ -110,7 +110,7 @@ def extract_graph(project: str) -> str:
             continue
         curr = pathjoin(dir, graph[-1])
         file_commit = dir.split(os.path.sep)[-1][0:-2]
-        os.rename(curr, pathjoin(output_path, file_commit+'.dot'))
+        os.rename(curr, pathjoin(output_path, file_commit + '.dot'))
         shutil.rmtree(dir)
     logging.info(f"[Info] - Extracted {len(os.listdir(output_path))}graphs from dataset {cpg_path}.")
     return output_path
@@ -132,21 +132,23 @@ def load_graphs(project: str) -> dict:
         # g = nx.Graph(nx.nx_pydot.read_dot(graph_path))  # uses pydot module
         output_graphs[graph] = g
 
-
-
     return output_graphs
 
+
 def append_graph_to_dataset(dataset: pd.DataFrame, output_graphs: dict) -> pd.DataFrame:
-    empty_list = [""]*len(output_graphs)
-    dataset['graph'] = empty_list
+    dataset['graph'] = ""
+    _graph_dict = {}
     for _, data in dataset.iterrows():
         _function_name = data['function_name']
         _commit = data['commit']
-        _full_name = _commit + '--' + _function_name
-        if output_graphs[_full_name] == "" or isinstance(output_graphs[_full_name], GraphData):
+        _full_name = _function_name + '--' + _commit
+        if _full_name not in output_graphs:
+            logging.warning(f"graph with value {_full_name} not found in dataset. Skip it.")
+            continue
+        _to_update = dataset.loc[(dataset.function_name == _function_name) & (dataset.commit == _commit)]
+        if _to_update['graph'].values.any() != "":  # or isinstance(output_graphs[_full_name], GraphData):
+            logging.warning(f"graph {_full_name} in dataset already contains a value. Skip it.")
             continue
         # update dataset in place
-        dataset.loc[(dataset.function_name == _function_name) & (dataset.commit == _commit),
-                    ['graph']] = output_graphs[_full_name]
+        dataset.loc[(dataset.function_name == _function_name) & (dataset.commit == _commit)].at['graph'] = [output_graphs[_full_name],]
     return dataset
-
