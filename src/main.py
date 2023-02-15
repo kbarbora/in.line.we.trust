@@ -32,7 +32,15 @@ def preprocess(project: str):
     # ----------- Load graphs
     graphs_data = data_processing.load_graphs(project)
     data_processing.append_graph_to_dataset(dataset, graphs_data)
+    # ----------- Overwrite pickle to save changes
+    pd.write_pickle(dataset_path)
 
+def encode_graphs(project: str) -> pd.Series:
+    """
+    Encode the graphs node attributes and edges attributes
+    :param project: The project to encode the graphs
+    :return: A pandas series object representing the graphs encoded
+    """
 
 
 def main():

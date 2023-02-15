@@ -1,10 +1,3 @@
-import errno
-import glob
-import json
-import logging
-import math
-import pickle
-import re
 import shutil
 import subprocess
 import os.path
@@ -18,6 +11,7 @@ import utility.config as configs
 from torch_geometric.data import Data as GraphData
 from networkx.drawing import nx_agraph
 import pygraphviz as pgv
+import numpy as np  # Need it to associate 'sum()' function to numpy
 
 PATHS = configs.Paths()
 PROJ_ROOT = os.path.abspath('.')  # path of the root project
@@ -138,17 +132,15 @@ def load_graphs(project: str) -> dict:
 def append_graph_to_dataset(dataset: pd.DataFrame, output_graphs: dict) -> pd.DataFrame:
     dataset['graph'] = ""
     _graph_dict = {}
-    for _, data in dataset.iterrows():
-        _function_name = data['function_name']
-        _commit = data['commit']
-        _full_name = _function_name + '--' + _commit
-        if _full_name not in output_graphs:
-            logging.warning(f"graph with value {_full_name} not found in dataset. Skip it.")
-            continue
+    for key, graph in output_graphs.items():
+        _function_name = key.split('--')[0]
+        _commit = key.split('--')[1]
         _to_update = dataset.loc[(dataset.function_name == _function_name) & (dataset.commit == _commit)]
-        if _to_update['graph'].values.any() != "":  # or isinstance(output_graphs[_full_name], GraphData):
-            logging.warning(f"graph {_full_name} in dataset already contains a value. Skip it.")
-            continue
-        # update dataset in place
-        dataset.loc[(dataset.function_name == _function_name) & (dataset.commit == _commit)].at['graph'] = [output_graphs[_full_name],]
+        for _index, _this in _to_update.iterrows():
+            if _this['graph'] != "":  # Most likely this will never be true.
+                logging.warning(f"graph {_function_name}--{_commit} in dataset already contains a value. Skip it.")
+            dataset.at[_index, 'graph'] = graph
+    empty_graphs = (dataset['graph'].values == '').sum()
+    if empty_graphs > 0:
+        logging.error(f"After adding graphs to dataset, it contains {empty_graphs} empty graphs values.")
     return dataset
