@@ -142,6 +142,10 @@ class Embed(Config):
         return self.get_property('nodes_dim')
 
     @property
+    def tokenize_regex(self):
+        return self.get_property('tokenizer_regex')
+
+    @property
     def w2v_args(self):
         return self.get_property('word2vec_args')
 
