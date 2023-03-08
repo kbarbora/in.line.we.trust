@@ -143,7 +143,7 @@ class Embed(Config):
 
     @property
     def tokenize_regex(self):
-        return self.get_property('tokenizer_regex')
+        return r"""(\b[A-Za-z_]\w*\b|[!\#\$%\&\*\+:\-\./<=>\?@\\\^_\|\~]+|[ \t\(\),;\{\}\[\]`"'])"""
 
     @property
     def w2v_args(self):
