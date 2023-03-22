@@ -51,6 +51,15 @@
     "embed" : {
         "nodes_dim" : 500,
         "tokenizer_regex": "SEE config.py",
+        "node_encoding":
+            { "CONTROL_STRUCTURE_TYPE": { "BREAK": 0, "CONTINUE": 1, "DO": 2, "WHILE": 3, "FOR": 4, "GOTO": 5,
+                "IF": 6, "ELSE": 7, "TRY": 8, "THROW": 9, "SWITCH": 10 }
+            },
+        "edge_encoding":
+            { "CONDITION": 0, "REACHING_DEF": 1, "DOMINATE": 2, "REF": 3, "ARGUMENT": 4,
+                "PARAMETER_LINK": 5, "RECEIVER": 6, "POST_DOMINATE": 7, "CONTAINS": 8, "AST": 9, "CFG": 10, "CDG": 11,
+                "CALL": 12, "BINDS_TO": 13, "INHERITS_FROM": 14
+            },
         "word2vec_args": {"size" : 100, "alpha" : 0.01, "window" : 5, "min_count" : 3, "sample" : 1e-5,
                 "workers" : 4, "sg" : 1, "hs" : 0, "negative" : 5
             },
