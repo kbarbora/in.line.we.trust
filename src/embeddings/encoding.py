@@ -26,7 +26,7 @@ def _tokenize_code(dataset_code: pd.Series) -> pd.Series:
     # _tokens = pd.Series()
     # HEADER:
     # PROJECT:str,COMMIT:str, FILENAME:str,INSTANCES:int,CODE LINES:list,LINES TOKENS:list,ENCODED LINES:list
-    _token_series = pd.Series()
+    _token_series = []
     _tokenizer = EMBED.tokenize_regex
     # @TODO: Add signature at the beginning of the code before tokenization
 
@@ -34,15 +34,21 @@ def _tokenize_code(dataset_code: pd.Series) -> pd.Series:
     for i, function in dataset_code.items():
         _tokenized = []
         for _line in function:
+            _line = re.sub(r'\s+', ' ', _line)  # delete word/line delimiter chars and replace them for a single space
             _tokens_line = re.findall(_pattern, _line)
             if _tokens_line == [""]:
                 logging.error(f"Empty tokens after running regex for line: {_line}")
             # _tokens_line.append("<NL>") # Need to further test if NL token is needed
             # Delete all empty tokens found
             [_tokens_line.pop(ndx) if token == " " else token for ndx, token in enumerate(_tokens_line)]
+            if len(_tokens_line) == 0:
+                continue
             _tokenized.append(_tokens_line)
+        # _tokenized = pd.Series(_tokenized)
+        print(_tokenized)
         _token_series.append(_tokenized)
-    return _token_series
+    return pd.Series(_token_series)
+
 
 def vectorize_code(token_series: pd.Series):
     """
@@ -55,6 +61,7 @@ def vectorize_code(token_series: pd.Series):
     # ignore tokenizer and preprocessor with dummy function since input is already tokenized
     tfidf = TfidfVectorizer(analyzer='word', max_features=3000,
                             tokenizer=dummy_function, preprocessor=dummy_function, token_pattern=None)
+    tfidf.fit(token_series)  # learn vocabulary from all the existing tokens
     vectors = tfidf.transform([token_series])  # vectors is a sparse matrix
     code_vectors = []
     for vector in range(vectors.shape[0]):  # iterate over each row
@@ -72,7 +79,7 @@ def _vectorize_nodes(nodes_att: pd.Series) -> pd.Series:
     """
     vectorize = {}
 
-    return
+    return pd.Series(vectorize)
 
 def _tokenize_edges(edges_att: pd.Series) -> pd.Series:
     tokenized = {}
