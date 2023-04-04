@@ -130,6 +130,9 @@ def load_graphs(project: str) -> dict:
 
 
 def append_graph_to_dataset(dataset: pd.DataFrame, output_graphs: dict) -> pd.DataFrame:
+    """
+    Add the graphs dict containing the networkX graphs to the appropiate dataset
+    """
     dataset['graph'] = ""
     _graph_dict = {}
     for key, graph in output_graphs.items():

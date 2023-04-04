@@ -699,3 +699,10 @@ None
 INFO:root:Java HEAP environment variable already set to 4GB. Continue.
 WARNING:root:File data/cpg/openssl.bin exists. Skipping.
 WARNING:root:GRAPH output path exists data/graph/openssl. Return existing files.
+INFO:root:Finish main function. Exit
+INFO:root:Dataset memory information: 
+None
+INFO:root:Java HEAP environment variable already set to 4GB. Continue.
+WARNING:root:File data/cpg/openssl.bin exists. Skipping.
+WARNING:root:GRAPH output path exists data/graph/openssl. Return existing files.
+ERROR:root:After adding graphs to dataset, it contains 60 empty graphs values.

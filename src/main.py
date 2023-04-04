@@ -1,4 +1,3 @@
-
 import logging
 import os
 import pandas as pd
@@ -8,9 +7,10 @@ import utility.config as config
 import preprocess.scrapper as scrapper
 import preprocess.data_processing as data_processing
 
-
 PATHS = config.Paths()
 PROJ_ROOT = os.path.abspath('.')  # path of the root project
+
+
 def preprocess(project: str):
     """
 
@@ -20,7 +20,8 @@ def preprocess(project: str):
     # ---------- Check for pre-process dataset, if not found run the scrapper function ---------------
     dataset_path = pathjoin(PATHS.raw, project, PATHS.vuln_source_code)
     if not os.path.exists(dataset_path):
-        raw = pd.read_json(PATHS.raw, project, PATHS.vulnerable_lines_json)  # read original 'CarrotBlender' dataset published by the authors
+        raw = pd.read_json(PATHS.raw, project,
+                           PATHS.vulnerable_lines_json)  # read original 'CarrotBlender' dataset published by the authors
         scrapper.scrape_dataset(project)
     dataset = pd.read_pickle(dataset_path)
     logging.info(f"Dataset memory information: \n{dataset.info(memory_usage='deep')}")
@@ -34,6 +35,7 @@ def preprocess(project: str):
     data_processing.append_graph_to_dataset(dataset, graphs_data)
     # ----------- Overwrite pickle to save changes
     pd.write_pickle(dataset_path)
+
 
 def encode_graphs(project: str) -> pd.Series:
     """
@@ -50,7 +52,7 @@ def main():
     parser = ArgumentParser()
     # parser.add_argument('-p', '--prepare', help='Prepare task', required=False)
     parser.add_argument('project', default="all", help="The Project to be process"
-                        " (options are ffmpeg, imagemagick, php, openssl, linux or all). Default is 'all'.")
+                                                       " (options are ffmpeg, imagemagick, php, openssl, linux or all). Default is 'all'.")
     parser.add_argument('-pP', '--preprocess', action='store_true')
     parser.add_argument('-e', '--embed', action='store_true')
     parser.add_argument('-jG', '--joint_graph', action='store_true')

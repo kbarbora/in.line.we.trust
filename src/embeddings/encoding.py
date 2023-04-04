@@ -2,7 +2,7 @@ import logging
 
 import pandas as pd
 import re
-from transformers import AutoTokenizer, AutoModelForMaskedLM
+# from transformers import AutoTokenizer, AutoModelForMaskedLM
 import utility.config as configs
 import os
 from networkx.drawing import nx_agraph
@@ -15,8 +15,8 @@ PROJ_ROOT = os.path.abspath('.')
 
 def _tokenize_code(dataset_code: pd.Series) -> pd.Series:
     """
-    Tokenize all the code for the current project, not recommended to use ALL projects since the vocabulary size will
-    be affected
+    Tokenize all the code for the current project, not recommended to use for ALL projects since the vocabulary size
+     will be affected and can explode.
     :param dataset_code: A pandas series object having as elements lists of the code of every function
     (list contain each line of code in string format)
     :return: A pandas series of the code tokenized
@@ -81,15 +81,23 @@ def _vectorize_nodes(nodes_att: pd.Series) -> pd.Series:
 
     return pd.Series(vectorize)
 
-def _tokenize_edges(edges_att: pd.Series) -> pd.Series:
-    tokenized = {}
+def _tokenize_att(graphs: list) -> pd.Series:
+    tokenized = []
+    edge_encoding: dict = EMBED.edge_encoding
+    for graph in graphs:
+
+        # EDGES
+        for edge_from, edge_to, edges_att in edge:
+
+
+
     return
 
 def tokenize_graph(graphs: pd.Series) -> pd.Series:
-    _tokenize_code(graphs)
-    _vectorize_nodes(graphs)
-    _tokenize_edges(graphs)
-    return
+    code_tokens = _tokenize_code(graphs)
+    code_vectors = vectorize_code(code_tokens)
+    # _tokenize_edges(graphs)
+    return code_vectors
 
 def dummy_function(_doc):
     return _doc

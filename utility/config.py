@@ -153,6 +153,10 @@ class Embed(Config):
     def edge_type(self):
         return self.get_property('edge_type')
 
+    @property
+    def edge_encoding(self):
+        return self.get_property('edge_encoding')
+
 
 class Process(Config):
     def __init__(self):
