@@ -85,9 +85,51 @@ def _tokenize_att(graphs: list) -> pd.Series:
     tokenized = []
     edge_encoding: dict = EMBED.edge_encoding
     for graph in graphs:
+        # NODES
+        for node_id , node_attr in graph.nodes(data=True):
+            # node_id: str, node_attr: dict
+            _attr_to_check = "AST_PARENT_FULL_NAME"
+            if _attr_to_check in node_attr:
+                # attr: AST_PARENT_FULL_NAME, reason: meaningless
+                # sample 'AST_PARENT_FULL_NAME': '/home/.../test_sqr--d02b48c63a58ea4367a0.c:<global>'
+                node_attr.pop(_attr_to_check)
+            _attr_to_check = "COLUMN_NUMBER"
+            if _attr_to_check in node_attr:
+                # attr: COLUMN_NUMBER, reason: redundant
+                # sample 'COLUMN_NUMBER': '5'
+                node_attr.pop(_attr_to_check)
+            _attr_to_check = "CANONICAL_NAME"
+            if _attr_to_check in node_attr:
+                # attr: CANONICAL_NAME, reason: redundant
+                # sample CANONICAL_NAME="data"
+                node_attr.pop(_attr_to_check)
+            _attr_to_check = "FILENAME"
+            if _attr_to_check in node_attr:
+                # attr: FILENAME, reason: redundant
+                # sample FILENAME="/home/.../asn1_d2i_read_bio.c"
+                node_attr.pop(_attr_to_check)
+            _attr_to_check = "SIGNATURE"
+            if _attr_to_check in node_attr:
+                # attr: SIGNATURE, reason: redundant
+                # sample SIGNATURE="int asn1_d2i_read_bio (BIO*,BUF_MEM**)"
+                node_attr.pop(_attr_to_check)
+            _attr_to_check = "NAME"
+            if _attr_to_check in node_attr:
+                # attr: NAME, reason: redundant
+                # sample 'NAME="<operator>.subtraction"', 'NAME="b"'
+                node_attr.pop(_attr_to_check)
+            _attr_to_check = "LINE_NUMBER_END"
+            if _attr_to_check in node_attr:
+                # attr: LINE_NUMBER_END, reason: meaningless
+                # sample LINE_NUMBER_END=12
+                node_attr.pop(_attr_to_check)
+
+
 
         # EDGES
-        for edge_from, edge_to, edges_att in edge:
+        for edge_from, edge_to, edges_att in graph.edges(data=True):
+
+
 
 
 

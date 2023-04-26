@@ -111,17 +111,23 @@ def extract_graph(project: str) -> str:
 
 
 def load_graphs(project: str) -> dict:
+    """
+    Load graphs from the project specified as argument (string). The format for the graphs will be a networkX DiGraph
+    object with the nodes attributes and edges attributes included. Keep in mind that all the attributes has to be encoded
+    to be use in the GNN. Finally, return a dict object with the graph name being the keys and the value the graph.
+    """
     input_graphs = pathjoin(PATHS.graph, project)
     output_graphs = {}
     _, _, graphs = next(os.walk(input_graphs))
     for graph in graphs:
         graph_path = pathjoin(input_graphs, graph)
         graph = graph.split('.')[0]  # remove extension
-        g = nx_agraph.from_agraph(pgv.AGraph(graph_path))
-        graphdata = GraphData()
-        for node, node_attr in g.nodes(data=True):
-            graphdata[node] = node_attr
-        graphdata.edge_index = list(g.nodes())
+        g = nx_agraph.from_agraph(pgv.AGraph(graph_path, directed=True))
+        # load graph into torch geometric object.
+        # graphdata = GraphData()
+        # for node, node_attr in g.nodes(data=True):
+        #     graphdata[node] = node_attr
+        # graphdata.edge_index = list(g.nodes())
 
         # g = nx.Graph(nx.nx_pydot.read_dot(graph_path))  # uses pydot module
         output_graphs[graph] = g
