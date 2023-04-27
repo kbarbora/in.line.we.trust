@@ -108,6 +108,12 @@ def _tokenize_att(graphs: list) -> pd.Series:
                 # attr: FILENAME, reason: redundant
                 # sample FILENAME="/home/.../asn1_d2i_read_bio.c"
                 node_attr.pop(_attr_to_check)
+            _attr_to_check = "METHOD_FULL_NAME"
+            if _attr_to_check in node_attr:
+                # attr: METHOD_FULL_NAME, reason: simplify
+                # sample METHOD_FULL_NAME="<operator>.indirectFieldAccess"
+
+
             _attr_to_check = "SIGNATURE"
             if _attr_to_check in node_attr:
                 # attr: SIGNATURE, reason: redundant
