@@ -154,8 +154,16 @@ class Embed(Config):
         return self.get_property('edge_type')
 
     @property
+    def node_encoding(self):
+        return self.get_property('node_encoding')
+
+    @property
     def edge_encoding(self):
         return self.get_property('edge_encoding')
+
+    @property
+    def attributes_to_delete(self):
+        return self.get_property('attributes_to_delete')
 
 
 class Process(Config):

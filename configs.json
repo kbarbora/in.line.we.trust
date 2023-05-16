@@ -51,15 +51,38 @@
     "embed" : {
         "nodes_dim" : 500,
         "tokenizer_regex": "SEE config.py",
+        "node_attr_to_delete":
+        [  "AST_PARENT_FULL_NAME", "NAME", "DISPATCH_TYPE", "SIGNATURE", "FILENAME",
+            "PARSER_TYPE_NAME", "CANONICAL_NAME", "ARGUMENT_INDEX", "LINE_NUMBER_END", "COLUMN_NUMBER",
+            "IS_EXTERNAL", "IS_VARIADIC", "LINE_NUMBER_END", "AST_PARENT_TYPE", "ORDER", "CONTAINED_REF",
+            "COLUMN_NUMBER_END"
+        ],
+        "node_attr_to_modify":
+        [  "METHOD_FULL_NAME", "FULL_NAME" ],
         "node_encoding":
             { "CONTROL_STRUCTURE_TYPE": { "BREAK": 0, "CONTINUE": 1, "DO": 2, "WHILE": 3, "FOR": 4, "GOTO": 5,
-                "IF": 6, "ELSE": 7, "TRY": 8, "THROW": 9, "SWITCH": 10 }
+                    "IF": 6, "ELSE": 7, "TRY": 8, "THROW": 9, "SWITCH": 10 },
+                "PARSER_TYPE_NAME": { "DO":  0, "EXPRESSION":  1, "LABEL": 2, "COMPOUND": 3,
+                    "PROBLEM": 4, "IF": 5, "GOTO": 6 },
+                "EVALUATION_STRATEGY": { "BY_REFERENCE": 0, "BY_VALUE": 1, "BY_SHARING": 2 }
+                "LABEL": {"CONTROL_STRUCTURE": 0, "LITERAL": 1, "RETURN": 2, "METHOD_PARAMETER_OUT": 3, "LOCAL": 4,
+                    "METHOD": 5, "FIELD_IDENTIFIER": 6, "UNKNOWN": 7, "BLOCK": 8, "IDENTIFIER": 9,
+                    "METHOD_PARAMETER_IN": 10, "JUMP_TARGET": 11, "METHOD_RETURN": 12, "CALL": 13,
+                    "AST_NODE": 14},
+                "TYPE_FULL_NAME": {"VOID": 0, "ANY":  1, "<EMPTY>":  2, "UNSIGNED": 3, "CHAR": 4, "INT": 5, "LONG": 6,
+                    "DOUBLE": 7, "FLOAT": 8, "SHORT": 9, "ARRAY": 10, "CUSTOM": 99},
+                "METHOD_FULL_NAME": {"ADDITION": 0, "ADDRESSOF": 1, "AND": 2, "ARITHMETICSHIFTRIGHT": 3,
+                    "ASSIGNMENT": 4, "ASSIGNMENTMINUS": 5, "ASSIGNMENTPLUS": 6, "CAST": 7, "CONDITIONAL": 8,
+                    "DIVISION": 9, "EQUALS": 10, "FIELDACCESS": 11, "GREATEREQUALSTHAN": 12, "CUSTOM": 99
+                }
             },
         "edge_encoding":
-            { "CONDITION": 0, "REACHING_DEF": 1, "DOMINATE": 2, "REF": 3, "ARGUMENT": 4,
+            { "LABEL": {"CONDITION": 0, "REACHING_DEF": 1, "DOMINATE": 2, "REF": 3, "ARGUMENT": 4,
                 "PARAMETER_LINK": 5, "RECEIVER": 6, "POST_DOMINATE": 7, "CONTAINS": 8, "AST": 9, "CFG": 10, "CDG": 11,
-                "CALL": 12, "BINDS_TO": 13, "INHERITS_FROM": 14
+                "CALL": 12, "BINDS_TO": 13, "INHERITS_FROM": 14},
+              "VARIABLE": {}
             },
+
         "word2vec_args": {"size" : 100, "alpha" : 0.01, "window" : 5, "min_count" : 3, "sample" : 1e-5,
                 "workers" : 4, "sg" : 1, "hs" : 0, "negative" : 5
             }

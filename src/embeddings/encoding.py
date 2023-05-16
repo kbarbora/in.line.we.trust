@@ -1,5 +1,6 @@
 import logging
 
+import networkx
 import pandas as pd
 import re
 # from transformers import AutoTokenizer, AutoModelForMaskedLM
@@ -83,63 +84,71 @@ def _vectorize_nodes(nodes_att: pd.Series) -> pd.Series:
 
 def _tokenize_att(graphs: list) -> pd.Series:
     tokenized = []
-    edge_encoding: dict = EMBED.edge_encoding
+    edge_encoding_mapping: dict = EMBED.edge_encoding
+    attr_to_delete = EMBED.attributes_to_delete()
     for graph in graphs:
         # NODES
-        for node_id , node_attr in graph.nodes(data=True):
+        _delete_node_attribute(graph, attr_to_delete)
+        for node_id, node_attr in graph.nodes(data=True):
             # node_id: str, node_attr: dict
-            _attr_to_check = "AST_PARENT_FULL_NAME"
-            if _attr_to_check in node_attr:
-                # attr: AST_PARENT_FULL_NAME, reason: meaningless
-                # sample 'AST_PARENT_FULL_NAME': '/home/.../test_sqr--d02b48c63a58ea4367a0.c:<global>'
-                node_attr.pop(_attr_to_check)
-            _attr_to_check = "COLUMN_NUMBER"
-            if _attr_to_check in node_attr:
-                # attr: COLUMN_NUMBER, reason: redundant
-                # sample 'COLUMN_NUMBER': '5'
-                node_attr.pop(_attr_to_check)
-            _attr_to_check = "CANONICAL_NAME"
-            if _attr_to_check in node_attr:
-                # attr: CANONICAL_NAME, reason: redundant
-                # sample CANONICAL_NAME="data"
-                node_attr.pop(_attr_to_check)
-            _attr_to_check = "FILENAME"
-            if _attr_to_check in node_attr:
-                # attr: FILENAME, reason: redundant
-                # sample FILENAME="/home/.../asn1_d2i_read_bio.c"
-                node_attr.pop(_attr_to_check)
             _attr_to_check = "METHOD_FULL_NAME"
             if _attr_to_check in node_attr:
                 # attr: METHOD_FULL_NAME, reason: simplify
                 # sample METHOD_FULL_NAME="<operator>.indirectFieldAccess"
-
-
-            _attr_to_check = "SIGNATURE"
-            if _attr_to_check in node_attr:
-                # attr: SIGNATURE, reason: redundant
-                # sample SIGNATURE="int asn1_d2i_read_bio (BIO*,BUF_MEM**)"
-                node_attr.pop(_attr_to_check)
-            _attr_to_check = "NAME"
-            if _attr_to_check in node_attr:
-                # attr: NAME, reason: redundant
-                # sample 'NAME="<operator>.subtraction"', 'NAME="b"'
-                node_attr.pop(_attr_to_check)
-            _attr_to_check = "LINE_NUMBER_END"
-            if _attr_to_check in node_attr:
-                # attr: LINE_NUMBER_END, reason: meaningless
-                # sample LINE_NUMBER_END=12
-                node_attr.pop(_attr_to_check)
-
-
-
+                _tmp = node_attr[_attr_to_check].replace("<operator>.", "")
+                graph[node_id][_attr_to_check] = _tmp
+        _encode_node_attribute(graph, edge_encoding_mapping)
         # EDGES
         for edge_from, edge_to, edges_att in graph.edges(data=True):
 
 
-
-
-
+def _delete_node_attribute(graph:networkx.DiGraph, attributes_to_delete:list):
+    # stats = {}
+    for att in attributes_to_delete:
+        for node_id, node_attr in graph.nodes(data=True):
+            if att in node_attr:
+                del graph[node_id][att]
+                # if att in stats.keys():
+                #     stats[att] += 1
+                # else:
+                #     stats[att] = 1
     return
+
+def _encode_node_attribute(graph:networkx.DiGraph, attributes_to_encode:dict):
+    """
+    Encode the node attributes of the parameter graph by using the mapping contained in the second param
+    attributes_to_encode. Since graph arg is passed by reference, no return value is needed.
+    :param graph: A networkx DiGraph object representing the graph to encode the node attributes
+    :param attributes_to_encode:  A dict object containing all the attributes names as key and as value, the mapping
+                                  from value to encoded numerical value
+    """
+    for att, mapping in attributes_to_encode.items():
+        for node_id, node_attr in graph.nodes(data=True):
+            if att in node_attr.keys():
+                tmp = node_attr[att].upper()
+                if att == 'TYPE_FULL_NAME':
+                    if tmp not in mapping.values():
+                        logging.info(f"Custom graph attributed used instead of {tmp} for Category {att}")
+                        tmp = "CUSTOM"
+                graph[node_id][node_attr] = mapping[tmp]
+    return
+
+def _encode_edge_attribute(graph:networkx.DiGraph, attributes_to_encode:dict):
+    """
+    Encode the edge attributes of the parameter graph by using the mapping contained in the second param
+    attributes_to_encode. Since graph arg is passed by reference, no return value is needed.
+        :param graph: A networkx DiGraph object representing the graph to encode the node attributes
+        :param attributes_to_encode:  A dict object containing all the attributes names as key and as value, the mapping
+                                      from value to encoded numerical value
+
+    """
+    for att, mapping in attributes_to_encode.items():
+        for edge_id, edge_attr in graph.edges(data=True):
+            if att in edge_attr.keys():
+                tmp = edge_attr[att].upper()
+                graph[edge_id][edge_attr] = mapping[tmp]
+
+
 
 def tokenize_graph(graphs: pd.Series) -> pd.Series:
     code_tokens = _tokenize_code(graphs)
