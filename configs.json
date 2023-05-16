@@ -64,7 +64,7 @@
                     "IF": 6, "ELSE": 7, "TRY": 8, "THROW": 9, "SWITCH": 10 },
                 "PARSER_TYPE_NAME": { "DO":  0, "EXPRESSION":  1, "LABEL": 2, "COMPOUND": 3,
                     "PROBLEM": 4, "IF": 5, "GOTO": 6 },
-                "EVALUATION_STRATEGY": { "BY_REFERENCE": 0, "BY_VALUE": 1, "BY_SHARING": 2 }
+                "EVALUATION_STRATEGY": { "BY_REFERENCE": 0, "BY_VALUE": 1, "BY_SHARING": 2 },
                 "LABEL": {"CONTROL_STRUCTURE": 0, "LITERAL": 1, "RETURN": 2, "METHOD_PARAMETER_OUT": 3, "LOCAL": 4,
                     "METHOD": 5, "FIELD_IDENTIFIER": 6, "UNKNOWN": 7, "BLOCK": 8, "IDENTIFIER": 9,
                     "METHOD_PARAMETER_IN": 10, "JUMP_TARGET": 11, "METHOD_RETURN": 12, "CALL": 13,
@@ -77,9 +77,9 @@
                 }
             },
         "edge_encoding":
-            { "LABEL": {"CONDITION": 0, "REACHING_DEF": 1, "DOMINATE": 2, "REF": 3, "ARGUMENT": 4,
-                "PARAMETER_LINK": 5, "RECEIVER": 6, "POST_DOMINATE": 7, "CONTAINS": 8, "AST": 9, "CFG": 10, "CDG": 11,
-                "CALL": 12, "BINDS_TO": 13, "INHERITS_FROM": 14},
+            { "LABEL": {"ARGUMENT": 0, "AST": 1, "BINDS_TO": 12, "CALL": 13, "CDG": 2, "CFG": 3, "CONDITION": 4, "CONTAINS": 5,
+                        "DOMINATE": 6, "INHERITS_FROM": 14, "PARAMETER_LINK": 7, "POST_DOMINATE": 8, "REACHING_DEF": 9,
+                        "RECEIVER": 10, "REF": 11},
               "VARIABLE": {}
             },
 

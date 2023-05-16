@@ -84,6 +84,7 @@ def _vectorize_nodes(nodes_att: pd.Series) -> pd.Series:
 
 def _tokenize_att(graphs: list) -> pd.Series:
     tokenized = []
+    node_encoding_mapping: dict = EMBED.node_encoding
     edge_encoding_mapping: dict = EMBED.edge_encoding
     attr_to_delete = EMBED.attributes_to_delete()
     for graph in graphs:
@@ -97,12 +98,13 @@ def _tokenize_att(graphs: list) -> pd.Series:
                 # sample METHOD_FULL_NAME="<operator>.indirectFieldAccess"
                 _tmp = node_attr[_attr_to_check].replace("<operator>.", "")
                 graph[node_id][_attr_to_check] = _tmp
-        _encode_node_attribute(graph, edge_encoding_mapping)
+        # NODES
+        _encode_node_attribute(graph, node_encoding_mapping)
         # EDGES
-        for edge_from, edge_to, edges_att in graph.edges(data=True):
+        _encode_edge_attribute(graph, edge_encoding_mapping)
 
 
-def _delete_node_attribute(graph:networkx.DiGraph, attributes_to_delete:list):
+def _delete_node_attribute(graph: networkx.DiGraph, attributes_to_delete: list):
     # stats = {}
     for att in attributes_to_delete:
         for node_id, node_attr in graph.nodes(data=True):
@@ -114,7 +116,8 @@ def _delete_node_attribute(graph:networkx.DiGraph, attributes_to_delete:list):
                 #     stats[att] = 1
     return
 
-def _encode_node_attribute(graph:networkx.DiGraph, attributes_to_encode:dict):
+
+def _encode_node_attribute(graph: networkx.DiGraph, attributes_to_encode: dict):
     """
     Encode the node attributes of the parameter graph by using the mapping contained in the second param
     attributes_to_encode. Since graph arg is passed by reference, no return value is needed.
@@ -147,8 +150,7 @@ def _encode_edge_attribute(graph:networkx.DiGraph, attributes_to_encode:dict):
             if att in edge_attr.keys():
                 tmp = edge_attr[att].upper()
                 graph[edge_id][edge_attr] = mapping[tmp]
-
-
+    return
 
 def tokenize_graph(graphs: pd.Series) -> pd.Series:
     code_tokens = _tokenize_code(graphs)
