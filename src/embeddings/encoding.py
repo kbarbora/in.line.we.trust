@@ -14,6 +14,7 @@ PATHS = configs.Paths()
 EMBED = configs.Embed()
 PROJ_ROOT = os.path.abspath('.')
 
+
 def _tokenize_code(dataset_code: pd.Series) -> pd.Series:
     """
     Tokenize all the code for the current project, not recommended to use for ALL projects since the vocabulary size
@@ -82,13 +83,11 @@ def _vectorize_nodes(nodes_att: pd.Series) -> pd.Series:
 
     return pd.Series(vectorize)
 
-def _tokenize_att(graphs: list) -> pd.Series:
-    tokenized = []
-    edge_encoding_mapping: dict = EMBED.edge_encoding
-    attr_to_delete = EMBED.attributes_to_delete()
+
+def _tokenize_att(graphs: list) -> list:
     for graph in graphs:
         # NODES
-        _delete_node_attribute(graph, attr_to_delete)
+        _delete_node_attribute(graph, EMBED.node_attr_to_delete)
         for node_id, node_attr in graph.nodes(data=True):
             # node_id: str, node_attr: dict
             _attr_to_check = "METHOD_FULL_NAME"
@@ -97,24 +96,45 @@ def _tokenize_att(graphs: list) -> pd.Series:
                 # sample METHOD_FULL_NAME="<operator>.indirectFieldAccess"
                 _tmp = node_attr[_attr_to_check].replace("<operator>.", "")
                 graph[node_id][_attr_to_check] = _tmp
-        _encode_node_attribute(graph, edge_encoding_mapping)
+        _encode_node_attribute(graph, EMBED.node_encoding)
         # EDGES
-        for edge_from, edge_to, edges_att in graph.edges(data=True):
+        _delete_edge_attribute(graph, EMBED.edge_attr_to_delete)
+        _encode_edge_attribute(graph, EMBED.edge_encoding)
+    return graphs
 
 
-def _delete_node_attribute(graph:networkx.DiGraph, attributes_to_delete:list):
+# def _drop_attribute_keys(graph: networkx.DiGraph, line_no_first_att: bool = True) -> networkx.DiGraph:
+#     # NODES
+#     for node_id, node_attr in graph.nodes(data=True):
+#
+#
+#     # EDGES
+#     for edge_from, edge_to, edge_attr in graph.edges(data=True):
+#
+#     return graph
+
+
+def _delete_node_attribute(graph: networkx.DiGraph, attributes_to_delete: list):
     # stats = {}
     for att in attributes_to_delete:
         for node_id, node_attr in graph.nodes(data=True):
             if att in node_attr:
-                del graph[node_id][att]
+                del graph.nodes[node_id][att]
                 # if att in stats.keys():
                 #     stats[att] += 1
                 # else:
                 #     stats[att] = 1
     return
 
-def _encode_node_attribute(graph:networkx.DiGraph, attributes_to_encode:dict):
+
+def _delete_edge_attribute(graph: networkx.DiGraph, attributes_to_delete: list):
+    for att in attributes_to_delete:
+        for edge_from, edge_to, edge_attr in graph.edges(data=True):
+            edge_attr.pop(att, None)
+    return
+
+
+def _encode_node_attribute(graph: networkx.DiGraph, attributes_to_encode: dict):
     """
     Encode the node attributes of the parameter graph by using the mapping contained in the second param
     attributes_to_encode. Since graph arg is passed by reference, no return value is needed.
@@ -125,15 +145,18 @@ def _encode_node_attribute(graph:networkx.DiGraph, attributes_to_encode:dict):
     for att, mapping in attributes_to_encode.items():
         for node_id, node_attr in graph.nodes(data=True):
             if att in node_attr.keys():
-                tmp = node_attr[att].upper()
+                tmp = node_attr[att]
                 if att == 'TYPE_FULL_NAME':
                     if tmp not in mapping.values():
                         logging.info(f"Custom graph attributed used instead of {tmp} for Category {att}")
                         tmp = "CUSTOM"
-                graph[node_id][node_attr] = mapping[tmp]
+                node_attr[att] = mapping[tmp]
+            else:   # att NOT found in graph, fill it with -1 (empty) since all graphs have to have the same atts
+                node_attr[att] = -1
     return
 
-def _encode_edge_attribute(graph:networkx.DiGraph, attributes_to_encode:dict):
+
+def _encode_edge_attribute(graph: networkx.DiGraph, attributes_to_encode: dict):
     """
     Encode the edge attributes of the parameter graph by using the mapping contained in the second param
     attributes_to_encode. Since graph arg is passed by reference, no return value is needed.
@@ -143,14 +166,13 @@ def _encode_edge_attribute(graph:networkx.DiGraph, attributes_to_encode:dict):
 
     """
     for att, mapping in attributes_to_encode.items():
-        for edge_id, edge_attr in graph.edges(data=True):
+        for edge_from, edge_to, edge_attr in graph.edges(data=True):
             if att in edge_attr.keys():
-                tmp = edge_attr[att].upper()
-                graph[edge_id][edge_attr] = mapping[tmp]
-
+                edge_attr[att] = mapping[edge_attr[att]]
 
 
 def tokenize_graph(graphs: pd.Series) -> pd.Series:
+
     code_tokens = _tokenize_code(graphs)
     code_vectors = vectorize_code(code_tokens)
     # _tokenize_edges(graphs)

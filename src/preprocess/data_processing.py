@@ -110,7 +110,7 @@ def extract_graph(project: str) -> str:
     return output_path
 
 
-def load_graphs(project: str) -> dict:
+def load_dot_graphs(project: str) -> dict:
     """
     Load graphs from the project specified as argument (string). The format for the graphs will be a networkX DiGraph
     object with the nodes attributes and edges attributes included. Keep in mind that all the attributes has to be encoded

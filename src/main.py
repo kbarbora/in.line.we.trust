@@ -31,10 +31,10 @@ def preprocess(project: str):
     # ----------- Check for graphs, if not found run joern-export to create them ----------------
     graphs_paths = data_processing.extract_graph(project)
     # ----------- Load graphs
-    graphs_data = data_processing.load_graphs(project)
+    graphs_data = data_processing.load_dot_graphs(project)
     data_processing.append_graph_to_dataset(dataset, graphs_data)
     # ----------- Overwrite pickle to save changes
-    pd.write_pickle(dataset_path)
+    dataset.to_pickle(dataset_path)
 
 
 def encode_graphs(project: str) -> pd.Series:
@@ -43,6 +43,7 @@ def encode_graphs(project: str) -> pd.Series:
     :param project: The project to encode the graphs
     :return: A pandas series object representing the graphs encoded
     """
+
 
 
 def main():
