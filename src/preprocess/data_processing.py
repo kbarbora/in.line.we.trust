@@ -153,3 +153,32 @@ def append_graph_to_dataset(dataset: pd.DataFrame, output_graphs: dict) -> pd.Da
     if empty_graphs > 0:
         logging.error(f"After adding graphs to dataset, it contains {empty_graphs} empty graphs values.")
     return dataset
+
+
+def create_sourcecode_df(project: str, dataset: pd.DataFrame, write_to_disk=True):
+    """
+    Create a pandas dataframe with the source code of all the files available for the specified project.
+    Header: commit, function_name, project, count_lines, count_vulnerable_lines_in_function, sourcecode
+    """
+    functions_path = pathjoin(PATHS.raw, project, "functions")
+    to_df = {"commit": [], "function_name": [], "project": project, "count_lines": [],
+             "count_vuln_dataset": [], "sourcecode": []}
+    for i in os.listdir(functions_path):
+        _file = i.split('/')[-1]
+        _function_name, _commit = _file.split('--')
+        to_df['function_name'].append(_function_name)
+        to_df['commit'].append(_commit)
+        with open(pathjoin(functions_path, i), 'r') as fd:  # I/O operation
+            _lines = fd.readlines()
+        to_df['sourcecode'].append(_lines)
+        to_df['count_lines'].append(len(_lines))
+        # if not (_commit in to_df['commit'] and _function_name in to_df['function_name']):
+        to_df['count_vuln_dataset'].append(len(dataset.loc[(dataset['commit'] == _commit) &
+                                                           (dataset['function_name'] == _function_name)]))
+    sourcecode_df = pd.DataFrame.from_dict(to_df)
+    if len(sourcecode_df) != len(os.listdir(functions_path)):
+        logging.error(f"Records in dataframe does not match records on path {functions_path}.")
+    if write_to_disk:
+        sourcecode_df.to_pickle(pathjoin(PATHS.raw, project, "sourcecode_dataset.pkl"))
+    return sourcecode_df
+
