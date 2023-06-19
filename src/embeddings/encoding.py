@@ -23,17 +23,16 @@ def _tokenize_code(dataset_code: pd.Series) -> pd.Series:
     (list contain each line of code in string format)
     :return: A pandas series of the code tokenized
     """
-    _pattern = re.compile(EMBED.tokenize_regex)
-    # tokenizer = AutoTokenizer.from_pretrained("maximus12793/CodeBERTa-small-v1-finetuned-cpp")
-    # _tokens = pd.Series()
+
     # HEADER:
     # PROJECT:str,COMMIT:str, FILENAME:str,INSTANCES:int,CODE LINES:list,LINES TOKENS:list,ENCODED LINES:list
+    _pattern = re.compile(EMBED.tokenize_regex)
     _token_series = []
     _tokenizer = EMBED.tokenize_regex
     # @TODO: Add signature at the beginning of the code before tokenization
 
-    # dataset_code is a pandas series containing a list with the lines of the source code
-    for i, function in dataset_code.items():
+    # dataset_code is a pandas series containing lists with the lines of the source code
+    for i, function in dataset_code['sourcecode'].items():
         _tokenized = []
         for _line in function:
             _line = re.sub(r'\s+', ' ', _line)  # delete word/line delimiter chars and replace them for a single space

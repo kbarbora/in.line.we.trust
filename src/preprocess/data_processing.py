@@ -167,7 +167,7 @@ def create_sourcecode_df(project: str, dataset: pd.DataFrame, write_to_disk=True
         _file = i.split('/')[-1]
         _function_name, _commit = _file.split('--')
         to_df['function_name'].append(_function_name)
-        to_df['commit'].append(_commit)
+        to_df['commit'].append(_commit.split('.')[0])
         with open(pathjoin(functions_path, i), 'r') as fd:  # I/O operation
             _lines = fd.readlines()
         to_df['sourcecode'].append(_lines)
@@ -179,6 +179,6 @@ def create_sourcecode_df(project: str, dataset: pd.DataFrame, write_to_disk=True
     if len(sourcecode_df) != len(os.listdir(functions_path)):
         logging.error(f"Records in dataframe does not match records on path {functions_path}.")
     if write_to_disk:
-        sourcecode_df.to_pickle(pathjoin(PATHS.raw, project, "sourcecode_dataset.pkl"))
+        sourcecode_df.to_pickle(pathjoin(PATHS.raw, project, "sourcecode_only_dataset.pkl"))
     return sourcecode_df
 
